@@ -1,0 +1,798 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Banana Birthday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fredoka:wght@400;500;600&family=Titan+One&display=swap">
+<style>
+/* Layout: a left-set headline built from Banana Bunch letters (one banana per stroke), a PLU sticker
+   slapped into the widest gap, the greeting and ripeness chart side by side, then the font itself.
+   Banana confetti falls over everything. One committed look: ripe yellow on banana-leaf green. */
+:root {
+  --leaf: #133821;
+  --leaf-glow: #22603A;
+  --vein: rgba(214, 240, 190, 0.04);
+  --line: rgba(255, 245, 212, 0.14);
+  --peel: #FFD43B;
+  --peel-deep: #D99A0B;
+  --peel-wash: rgba(255, 212, 59, 0.13);
+  --flesh: #FFF5D4;
+  --flesh-dim: #B6C8A4;
+  --shade: rgba(4, 18, 9, 0.45);
+  --font-display: "Titan One", "Arial Black", Impact, sans-serif;
+  --font-body: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --font-label: "DM Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+html { background: var(--leaf); }
+body {
+  background:
+    radial-gradient(ellipse 75% 50% at 35% 22%, var(--leaf-glow), transparent 72%),
+    repeating-linear-gradient(118deg, transparent 0 54px, var(--vein) 54px 56px),
+    var(--leaf);
+  color: var(--flesh);
+  font: 400 16px/1.5 var(--font-body);
+  overflow-x: hidden;
+}
+
+.party {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-inline: clamp(16px, 4vw, 40px);
+  padding-block: clamp(28px, 5vw, 56px) clamp(36px, 6vw, 72px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(28px, 4.5vw, 52px);
+}
+.party > * { min-width: 0; }
+
+.type-wrap { position: relative; }
+#type { display: block; width: 100%; min-height: 160px; }
+
+.sticker {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: clamp(9px, 1.35vw, 14px);
+  width: 8.6em;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--flesh);
+  color: var(--leaf);
+  border: 0.34em solid var(--peel);
+  box-shadow: 0 0.35em 0.7em var(--shade);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  text-align: center;
+  line-height: 1;
+  transform: rotate(-11deg);
+  z-index: 2;
+}
+.sticker small {
+  font-family: var(--font-label);
+  font-weight: 500;
+  font-size: 0.8em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.sticker b {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 2.55em;
+  margin-block: 0.1em 0.06em;
+}
+
+.below {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 32px 56px;
+}
+.greeting { min-width: 0; }
+.tagline {
+  margin: 0;
+  font-weight: 600;
+  font-size: clamp(1.45rem, 1rem + 2vw, 2.3rem);
+  line-height: 1.12;
+  max-width: 20ch;
+  text-wrap: balance;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-top: 22px;
+}
+.throw {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 600 1.05rem/1 var(--font-body);
+  color: var(--leaf);
+  background: var(--peel);
+  border: 0;
+  border-radius: 999px;
+  padding: 13px 22px 13px 16px;
+  box-shadow: 0 4px 0 var(--peel-deep);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.throw:hover { transform: translateY(-2px) rotate(-2deg); box-shadow: 0 6px 0 var(--peel-deep); }
+.throw:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--peel-deep); }
+.throw:focus-visible, .get-font:focus-visible { outline: 3px solid var(--flesh); outline-offset: 4px; }
+.throw-icon { width: 30px; height: 15px; }
+.hint { color: var(--flesh-dim); font-size: 0.95rem; }
+
+.label {
+  margin: 0 0 10px;
+  font: 500 0.75rem/1 var(--font-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--flesh-dim);
+}
+
+.ripeness { width: min(100%, 380px); }
+.scale {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.scale li {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 6px 2px 5px;
+  border-radius: 10px;
+}
+.scale canvas { width: 100%; max-width: 56px; aspect-ratio: 2 / 1; }
+.scale span {
+  font: 400 0.75rem/1 var(--font-label);
+  font-variant-numeric: tabular-nums;
+  color: var(--flesh-dim);
+}
+.scale li.you { background: var(--peel-wash); box-shadow: inset 0 0 0 1.5px var(--peel); }
+.scale li.you span { color: var(--peel); font-weight: 500; }
+.ripe-note { margin: 12px 0 0; color: var(--flesh-dim); font-size: 0.95rem; max-width: 38ch; }
+
+.typeface {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  align-items: center;
+  gap: 28px 56px;
+  padding-top: clamp(28px, 4vw, 44px);
+  border-top: 1px solid var(--line);
+}
+.typeface-copy { min-width: 0; }
+.typeface h2 {
+  margin: 0;
+  font-weight: 600;
+  font-size: clamp(1.6rem, 1.1rem + 2vw, 2.4rem);
+  line-height: 1.1;
+}
+.about { margin: 12px 0 0; color: var(--flesh-dim); max-width: 42ch; }
+.get-font {
+  margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 1rem/1 var(--font-body);
+  color: var(--peel);
+  background: transparent;
+  border: 2px solid var(--peel);
+  border-radius: 999px;
+  padding: 11px 20px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.get-font:hover { background: var(--peel); color: var(--leaf); }
+.get-font[disabled] { opacity: 0.6; cursor: progress; }
+.font-status { margin: 10px 0 0; min-height: 1.5em; font-size: 0.92rem; color: var(--flesh-dim); }
+.specimen-wrap { min-width: 0; }
+#specimen { display: block; width: 100%; }
+
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+#confetti {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+}
+
+@media (max-width: 720px) {
+  .below, .typeface { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .throw, .get-font { transition: none; }
+}
+/* Base reset (the claude.ai viewer adds these to the published copy). */
+body { margin: 0; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<main class="party">
+  <header>
+    <h1 class="vh" id="heading">Happy Birthday, Anna Banana!</h1>
+    <div class="type-wrap" id="typeWrap">
+      <canvas id="type" aria-hidden="true"></canvas>
+      <div class="sticker" id="sticker" aria-hidden="true">
+        <small>Birthday</small>
+        <b>4011</b>
+        <small>Extra sweet</small>
+      </div>
+    </div>
+  </header>
+
+  <div class="below">
+    <section class="greeting">
+      <p class="tagline">Another year riper. Another year sweeter.</p>
+      <div class="actions">
+        <button class="throw" id="more" type="button">
+          <canvas class="throw-icon" data-stage="6" aria-hidden="true"></canvas>
+          Throw more bananas
+        </button>
+        <span class="hint">or tap anywhere to toss a bunch</span>
+      </div>
+    </section>
+
+    <section class="ripeness" aria-labelledby="ripeTitle">
+      <h2 class="label" id="ripeTitle">Ripeness check</h2>
+      <ol class="scale">
+        <li title="Stage 1: all green"><canvas data-stage="1" aria-hidden="true"></canvas><span>1</span><span class="vh">all green</span></li>
+        <li title="Stage 2: green, trace of yellow"><canvas data-stage="2" aria-hidden="true"></canvas><span>2</span><span class="vh">green, trace of yellow</span></li>
+        <li title="Stage 3: more green than yellow"><canvas data-stage="3" aria-hidden="true"></canvas><span>3</span><span class="vh">more green than yellow</span></li>
+        <li title="Stage 4: more yellow than green"><canvas data-stage="4" aria-hidden="true"></canvas><span>4</span><span class="vh">more yellow than green</span></li>
+        <li title="Stage 5: yellow, green tip"><canvas data-stage="5" aria-hidden="true"></canvas><span>5</span><span class="vh">yellow with a green tip</span></li>
+        <li title="Stage 6: all yellow"><canvas data-stage="6" aria-hidden="true"></canvas><span>6</span><span class="vh">all yellow</span></li>
+        <li class="you" title="Stage 7: yellow, flecked with brown" aria-current="true"><canvas data-stage="7" aria-hidden="true"></canvas><span>7</span><span class="vh">yellow, flecked with brown</span></li>
+      </ol>
+      <p class="ripe-note">That's you at stage 7: yellow, flecked with brown, and the sweetest a banana gets.</p>
+    </section>
+  </div>
+
+  <section class="typeface" aria-labelledby="fontTitle">
+    <div class="typeface-copy">
+      <p class="label">The lettering</p>
+      <h2 id="fontTitle">Banana Bunch</h2>
+      <p class="about">Every stroke is one banana. An H takes three, a T takes two, and an O is two bananas joined at the stem.</p>
+      <p class="about">Apps that support colour fonts show the bananas in yellow. Others draw them as solid shapes in your text colour.</p>
+      <button class="get-font" id="getFont" type="button" hidden>Download the font (.ttf)</button>
+      <p class="font-status" id="fontStatus" aria-live="polite"></p>
+    </div>
+    <div class="specimen-wrap" id="specWrap">
+      <canvas id="specimen" role="img" aria-label="The Banana Bunch alphabet, A to Z, digits 0 to 9 and punctuation, each letter built from bananas"></canvas>
+    </div>
+  </section>
+</main>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script type="application/json" id="bananaFont">
+<!--FONT_JSON-->
+</script>
+
+<script>
+(() => {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const DPR = Math.min(window.devicePixelRatio || 1, 2.5);
+  const TAU = Math.PI * 2;
+  const DEFAULT_NAME = 'Anna Banana';
+  const rand = (a, b) => (b === undefined ? Math.random() * a : a + Math.random() * (b - a));
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  function seeded(seed) {
+    return () => {
+      seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /* ---------- Loose bananas (confetti, ripeness chart), drawn in a 120 x 60 box ---------- */
+  // The seven stages of the standard banana ripening chart.
+  const STAGES = [
+    { ends: '#4C8A2B', body: '#6DA634', edge: '#2E5718', stem: '#3C5A1D' },
+    { ends: '#5A962E', body: '#94BD3B', edge: '#3D6919', stem: '#3F5E1E' },
+    { ends: '#78A733', body: '#BFCB3D', edge: '#5C7317', stem: '#47601F' },
+    { ends: '#97B836', body: '#E6D23F', edge: '#857B14', stem: '#4E6420' },
+    { ends: '#9CC23C', body: '#FFD843', edge: '#8F8418', stem: '#556A22' },
+    { ends: '#F0C232', body: '#FFD43B', edge: '#B07A0E', stem: '#6A5520' },
+    { ends: '#E8B42E', body: '#FBCB35', edge: '#A46C0F', stem: '#5A3A17', spots: 11 },
+  ];
+
+  function loosePath(c) {
+    c.beginPath();
+    c.moveTo(14, 18);
+    c.bezierCurveTo(30, 34, 80, 36, 108, 14);
+    c.bezierCurveTo(111, 12, 115, 14, 112, 18);
+    c.bezierCurveTo(90, 52, 30, 54, 12, 26);
+    c.bezierCurveTo(10, 23, 11, 19, 14, 18);
+    c.closePath();
+  }
+
+  function makeBanana(pal, seed = 1, S = 2) {
+    const raw = document.createElement('canvas');
+    raw.width = 128 * S;
+    raw.height = 64 * S;
+    const c = raw.getContext('2d');
+    c.scale(S, S);
+    c.translate(4, 2);
+    c.lineCap = 'round';
+    c.lineJoin = 'round';
+    c.strokeStyle = pal.stem;
+    c.lineWidth = 6;
+    c.beginPath(); c.moveTo(17, 22); c.quadraticCurveTo(9, 19, 5, 13); c.stroke();
+    c.fillStyle = '#3A2410';
+    c.beginPath(); c.arc(5, 13, 3.2, 0, TAU); c.fill();
+    const g = c.createLinearGradient(10, 0, 114, 0);
+    g.addColorStop(0, pal.ends);
+    g.addColorStop(0.28, pal.body);
+    g.addColorStop(0.74, pal.body);
+    g.addColorStop(1, pal.ends);
+    loosePath(c);
+    c.fillStyle = g;
+    c.fill();
+    c.save();
+    loosePath(c);
+    c.clip();
+    c.strokeStyle = 'rgba(120, 66, 0, 0.26)';
+    c.lineWidth = 10;
+    c.beginPath(); c.moveTo(112, 18); c.bezierCurveTo(90, 52, 30, 54, 12, 26); c.stroke();
+    c.strokeStyle = 'rgba(255, 255, 240, 0.55)';
+    c.lineWidth = 2.6;
+    c.beginPath(); c.moveTo(24, 26); c.quadraticCurveTo(58, 46, 100, 21); c.stroke();
+    if (pal.spots) {
+      const r = seeded(seed);
+      c.fillStyle = 'rgba(86, 50, 14, 0.82)';
+      for (let i = 0; i < pal.spots; i++) {
+        const t = 0.12 + r() * 0.76, u = 1 - t;
+        const x = u * u * 16 + 2 * u * t * 58 + t * t * 108;
+        const y = u * u * 22 + 2 * u * t * 56 + t * t * 16 + (r() - 0.5) * 9;
+        c.beginPath();
+        c.ellipse(x, y, 0.9 + r() * 1.7, 0.7 + r() * 1.1, r() * TAU, 0, TAU);
+        c.fill();
+      }
+    }
+    c.restore();
+    loosePath(c);
+    c.strokeStyle = pal.edge;
+    c.lineWidth = 2;
+    c.stroke();
+    c.fillStyle = '#3A2410';
+    c.beginPath(); c.arc(110.5, 16, 2.5, 0, TAU); c.fill();
+    return withShadow(raw, 3 * S, 2 * S);
+  }
+
+  function withShadow(raw, blur, dy) {
+    const out = document.createElement('canvas');
+    out.width = raw.width;
+    out.height = raw.height;
+    const o = out.getContext('2d');
+    o.shadowColor = 'rgba(4, 20, 10, 0.5)';
+    o.shadowBlur = blur;
+    o.shadowOffsetY = dy;
+    o.drawImage(raw, 0, 0);
+    return out;
+  }
+
+  const LOOSE = {
+    ripe: makeBanana(STAGES[5], 1),
+    fresh: makeBanana(STAGES[4], 2),
+    green: makeBanana(STAGES[2], 4),
+    sugar: [makeBanana(STAGES[6], 3), makeBanana(STAGES[6], 7), makeBanana(STAGES[6], 13)],
+  };
+  const pickLoose = () => {
+    const r = Math.random();
+    return r < 0.5 ? LOOSE.ripe : r < 0.7 ? LOOSE.fresh : r < 0.92 ? LOOSE.sugar[(Math.random() * 3) | 0] : LOOSE.green;
+  };
+
+  document.querySelectorAll('canvas[data-stage]').forEach(cv => {
+    const n = +cv.dataset.stage;
+    cv.width = Math.round(64 * DPR);
+    cv.height = Math.round(32 * DPR);
+    cv.getContext('2d').drawImage(makeBanana(STAGES[n - 1], 5 + n), 0, 0, cv.width, cv.height);
+  });
+
+  /* ---------- Banana Bunch letters ---------- */
+  const FONT = JSON.parse(document.getElementById('bananaFont').textContent);
+  const [C_EDGE, C_STEM, C_PEEL, C_SHADE, C_SHINE, C_TIP] = FONT.colors;
+  const SIDE = 40; // side bearing built into every glyph's advance, in font units
+
+  function box(polys) {
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const p of polys) {
+      for (let i = 0; i < p.length; i += 2) {
+        x0 = Math.min(x0, p[i]); x1 = Math.max(x1, p[i]);
+        y0 = Math.min(y0, p[i + 1]); y1 = Math.max(y1, p[i + 1]);
+      }
+    }
+    return { x0, y0, x1, y1 };
+  }
+  for (const ch in FONT.glyphs) {
+    const g = FONT.glyphs[ch];
+    g.y0 = 0; g.y1 = FONT.cap;
+    for (const b of g.b) {
+      b.box = box([b.s, b.b]);
+      g.y0 = Math.min(g.y0, b.box.y0);
+      g.y1 = Math.max(g.y1, b.box.y1);
+    }
+  }
+
+  const ALIAS = { '’': "'", '‘': "'", '–': '-', '‐': '-', ' ': ' ' };
+  function glyphFor(ch) {
+    const c = ALIAS[ch] || ch.toUpperCase();
+    return FONT.glyphs[c] || FONT.glyphs['?'];
+  }
+  const inkUnits = text => [...text].reduce((sum, ch) => sum + glyphFor(ch).a, 0) - 2 * SIDE;
+
+  // Same smoothing the font uses: samples are control points, midpoints are on the curve.
+  function trace(c, p, X, Y) {
+    const n = p.length / 2;
+    const px = i => X(p[(i % n) * 2]), py = i => Y(p[(i % n) * 2 + 1]);
+    c.moveTo((px(0) + px(1)) / 2, (py(0) + py(1)) / 2);
+    for (let i = 1; i <= n; i++) {
+      c.quadraticCurveTo(px(i), py(i), (px(i) + px(i + 1)) / 2, (py(i) + py(i + 1)) / 2);
+    }
+    c.closePath();
+  }
+
+  const spriteCache = new Map();
+  function fontBanana(b, k) {
+    const key = b;
+    let byScale = spriteCache.get(key);
+    if (!byScale) spriteCache.set(key, (byScale = new Map()));
+    if (byScale.has(k)) return byScale.get(k);
+
+    const bx = b.box, pad = FONT.edge * k + 6;
+    const w = (bx.x1 - bx.x0) * k + pad * 2, h = (bx.y1 - bx.y0) * k + pad * 2;
+    const raw = document.createElement('canvas');
+    raw.width = Math.ceil(w * DPR);
+    raw.height = Math.ceil(h * DPR);
+    const c = raw.getContext('2d');
+    c.setTransform(DPR, 0, 0, DPR, 0, 0);
+    const X = x => (x - bx.x0) * k + pad, Y = y => (bx.y1 - y) * k + pad;
+    const fill = (poly, color, outline) => {
+      c.beginPath();
+      trace(c, poly, X, Y);
+      c.fillStyle = color;
+      c.fill();
+      if (outline) c.stroke();
+    };
+    c.lineJoin = 'round';
+    c.strokeStyle = C_EDGE;
+    c.lineWidth = 2 * FONT.edge * k;
+    fill(b.s, C_EDGE, true);
+    fill(b.b, C_EDGE, true);
+    fill(b.s, C_STEM);
+    fill(b.b, C_PEEL);
+    fill(b.d, C_SHADE);
+    fill(b.h, C_SHINE);
+    fill(b.t, C_TIP);
+    const sprite = { img: withShadow(raw, 3 * DPR, 2 * DPR), w, h };
+    byScale.set(k, sprite);
+    return sprite;
+  }
+
+  // Lay out lines of text; returns each banana's resting centre plus line metrics (CSS px).
+  function layout(lines, k, x0, top, gap) {
+    const bananas = [], rows = [];
+    let y = top;
+    for (const text of lines) {
+      const glyphs = [...text].map(glyphFor);
+      const asc = Math.max(...glyphs.map(g => g.y1)), desc = Math.max(0, ...glyphs.map(g => -g.y0));
+      const base = y + asc * k;
+      let pen = x0 - SIDE * k;
+      for (const g of glyphs) {
+        for (const b of g.b) {
+          bananas.push({
+            src: b,
+            tx: pen + ((b.box.x0 + b.box.x1) / 2) * k,
+            ty: base - ((b.box.y0 + b.box.y1) / 2) * k,
+          });
+        }
+        pen += g.a * k;
+      }
+      rows.push({ top: y, base, capTop: base - FONT.cap * k, ink: inkUnits(text) * k });
+      y = base + desc * k + gap;
+    }
+    return { bananas, rows, bottom: y - gap };
+  }
+
+  /* ---------- Headline ---------- */
+  const typeWrap = document.getElementById('typeWrap');
+  const typeCanvas = document.getElementById('type');
+  const tctx = typeCanvas.getContext('2d');
+  const sticker = document.getElementById('sticker');
+  const heading = document.getElementById('heading');
+  let bunch = [], pushRadius = 60;
+
+  function getName() {
+    let raw = location.hash.slice(1);
+    try { raw = decodeURIComponent(raw); } catch (e) { /* keep raw */ }
+    const name = raw.replace(/[_.~+-]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 24);
+    return name || DEFAULT_NAME;
+  }
+
+  function chooseLines(W) {
+    const nameWords = getName().toUpperCase().split(' ');
+    nameWords[nameWords.length - 1] += '!';
+    const kMax = 150 / FONT.cap;
+    const two = ['HAPPY BIRTHDAY', nameWords.join(' ')];
+    const k2 = Math.min(kMax, W / Math.max(...two.map(inkUnits)));
+    if (k2 * FONT.cap >= 64) return { lines: two, k: k2 };
+    const many = ['HAPPY', 'BIRTHDAY', ...nameWords];
+    return { lines: many, k: Math.min(kMax, W / Math.max(...many.map(inkUnits))) };
+  }
+
+  function buildHeadline(intro) {
+    const W = Math.floor(typeWrap.clientWidth);
+    if (!W) return;
+    const name = getName();
+    heading.textContent = `Happy Birthday, ${name}!`;
+    const { lines, k } = chooseLines(W);
+    const capPx = FONT.cap * k, padX = 14, padY = 12;
+    const lay = layout(lines, k, padX, padY, capPx * 0.24);
+    const mw = W + padX * 2, mh = Math.ceil(lay.bottom + padY);
+
+    bunch = lay.bananas.map(b => {
+      const sp = fontBanana(b.src, k);
+      const bn = { x: b.tx, y: b.ty, tx: b.tx, ty: b.ty, vx: 0, vy: 0, rot: 0, vr: 0, img: sp.img, w: sp.w, h: sp.h, ph: rand(TAU) };
+      if (intro && !reduceMotion) {
+        bn.y = b.ty - rand(80, 80 + mh);
+        bn.x = b.tx + rand(-24, 24);
+        bn.rot = rand(-0.9, 0.9);
+      }
+      return bn;
+    });
+    pushRadius = Math.max(40, capPx * 0.75);
+
+    typeCanvas.width = Math.round(mw * DPR);
+    typeCanvas.height = Math.round(mh * DPR);
+    typeCanvas.style.width = mw + 'px';
+    typeCanvas.style.height = mh + 'px';
+    typeCanvas.style.margin = `${-padY}px 0 ${-padY}px ${-padX}px`;
+    typeCanvas.style.minHeight = '0';
+
+    // Stick the PLU sticker into the widest gap at the end of a line.
+    const sw = sticker.offsetWidth, sh = sticker.offsetHeight;
+    const row = lay.rows.reduce((a, r) => (W - r.ink > W - a.ink ? r : a));
+    const room = W - row.ink;
+    sticker.style.right = 'auto';
+    if (room >= sw * 1.1) {
+      sticker.style.left = row.ink + (room - sw) / 2 + 'px';
+      sticker.style.top = (row.capTop + row.base) / 2 - padY - sh / 2 + 'px';
+    } else {
+      sticker.style.left = W - sw * 0.9 + 'px';
+      sticker.style.top = -sh * 0.45 + 'px';
+    }
+  }
+
+  function drawHeadline(dt, t, px, py) {
+    tctx.setTransform(1, 0, 0, 1, 0, 0);
+    tctx.clearRect(0, 0, typeCanvas.width, typeCanvas.height);
+    const R = pushRadius, R2 = R * R, push = R * 55;
+    const damp = Math.exp(-10 * dt), rdamp = Math.exp(-8 * dt);
+    for (const b of bunch) {
+      const dx = b.x - px, dy = b.y - py, d2 = dx * dx + dy * dy;
+      if (d2 < R2) {
+        const d = Math.sqrt(d2) || 1, f = 1 - d / R;
+        b.vx += (dx / d) * f * push * dt;
+        b.vy += (dy / d) * f * push * dt;
+        b.vr += (dx >= 0 ? 1 : -1) * f * 14 * dt;
+      }
+      b.vx = (b.vx + (b.tx - b.x) * 120 * dt) * damp;
+      b.vy = (b.vy + (b.ty - b.y) * 120 * dt) * damp;
+      b.vr = (b.vr - b.rot * 90 * dt) * rdamp;
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+      b.rot += b.vr * dt;
+      const wobble = reduceMotion ? 0 : Math.sin(t * 1.6 + b.ph) * 0.035;
+      const c = Math.cos(b.rot + wobble) * DPR, s = Math.sin(b.rot + wobble) * DPR;
+      tctx.setTransform(c, s, -s, c, b.x * DPR, b.y * DPR);
+      tctx.drawImage(b.img, -b.w / 2, -b.h / 2, b.w, b.h);
+    }
+  }
+
+  /* ---------- Specimen ---------- */
+  const specWrap = document.getElementById('specWrap');
+  const specCanvas = document.getElementById('specimen');
+  const SPECIMEN = ['ABCDEFG', 'HIJKLMN', 'OPQRSTU', 'VWXYZ', '0123456789', "!?.,'-:+/"];
+
+  function buildSpecimen() {
+    const W = Math.floor(specWrap.clientWidth);
+    if (!W) return;
+    const k = clamp(W * 0.065, 24, 44) / FONT.cap, pad = 10;
+    const rows = [];
+    for (const word of SPECIMEN) {
+      const last = rows[rows.length - 1];
+      if (last && inkUnits(last + ' ' + word) * k <= W) rows[rows.length - 1] = last + ' ' + word;
+      else rows.push(word);
+    }
+    const fit = Math.min(k, W / Math.max(...rows.map(inkUnits)));
+    const lay = layout(rows, fit, pad, pad, FONT.cap * fit * 0.45);
+    const cw = W + pad * 2, ch = Math.ceil(lay.bottom + pad);
+    specCanvas.width = Math.round(cw * DPR);
+    specCanvas.height = Math.round(ch * DPR);
+    specCanvas.style.width = cw + 'px';
+    specCanvas.style.height = ch + 'px';
+    specCanvas.style.margin = `${-pad}px 0 ${-pad}px ${-pad}px`;
+    const c = specCanvas.getContext('2d');
+    c.setTransform(DPR, 0, 0, DPR, 0, 0);
+    for (const b of lay.bananas) {
+      const sp = fontBanana(b.src, fit);
+      c.drawImage(sp.img, b.tx - sp.w / 2, b.ty - sp.h / 2, sp.w, sp.h);
+    }
+  }
+
+  /* ---------- Font download ---------- */
+  const getFont = document.getElementById('getFont');
+  const fontStatus = document.getElementById('fontStatus');
+  (async () => {
+    if (!window.claude || typeof window.claude.use !== 'function') {
+      // Outside claude.ai (GitHub Pages, or the file opened from disk) a plain link does the job.
+      getFont.hidden = false;
+      getFont.addEventListener('click', () => {
+        const a = document.createElement('a');
+        a.href = 'BananaBunch.ttf';
+        a.download = 'BananaBunch.ttf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      });
+      return;
+    }
+    const downloads = await window.claude.use('downloads');
+    if (!downloads) return;
+    getFont.hidden = false;
+    getFont.addEventListener('click', async () => {
+      getFont.disabled = true;
+      fontStatus.textContent = 'Getting the font ready…';
+      try {
+        const res = await fetch('BananaBunch.ttf');
+        if (!res.ok) throw { code: 'fetch_failed' };
+        const blob = await res.blob();
+        await downloads.save({ filename: 'BananaBunch.ttf', data: blob });
+        fontStatus.textContent = 'Saved BananaBunch.ttf. Open it to install the font.';
+      } catch (e) {
+        const code = e && e.code;
+        if (code === 'declined') fontStatus.textContent = 'Download cancelled.';
+        else if (code === 'rate_limited') fontStatus.textContent = 'A save prompt is already open. Finish that one first.';
+        else if (code === 'fetch_failed') fontStatus.textContent = "The font file didn't load. Try again in a moment.";
+        else {
+          getFont.hidden = true;
+          fontStatus.textContent = "Downloads aren't available in this view.";
+        }
+      } finally {
+        getFont.disabled = false;
+      }
+    });
+  })();
+
+  /* ---------- Banana confetti ---------- */
+  const conf = document.getElementById('confetti');
+  const cctx = conf.getContext('2d');
+  const pieces = [];
+  const G = 520, DRAG = 2.1;
+  let VW = 0, VH = 0;
+
+  function sizeConfetti() {
+    VW = window.innerWidth;
+    VH = window.innerHeight;
+    conf.width = Math.round(VW * DPR);
+    conf.height = Math.round(VH * DPR);
+  }
+
+  function addPiece(p) {
+    pieces.push(Object.assign({
+      img: pickLoose(),
+      len: clamp(VW * 0.045, 24, 46) * rand(0.8, 1.25),
+      rot: rand(TAU), vr: rand(-4, 4),
+      fl: rand(TAU), fs: rand(3, 8),
+      sp: rand(TAU), sf: rand(1.2, 2.6), sa: rand(15, 55),
+    }, p));
+    if (pieces.length > 600) pieces.shift();
+  }
+
+  function rain(n) {
+    for (let i = 0; i < n; i++) {
+      addPiece({ x: rand(-20, VW + 20), y: -40 - rand(VH * 0.8), vx: rand(-30, 30), vy: rand(80, 220) });
+    }
+  }
+
+  function burst(x, y, n) {
+    for (let i = 0; i < n; i++) {
+      const a = -Math.PI / 2 + rand(-1.15, 1.15), sp = rand(320, 780);
+      addPiece({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp });
+    }
+  }
+
+  function drawConfetti(dt, t) {
+    cctx.setTransform(1, 0, 0, 1, 0, 0);
+    cctx.clearRect(0, 0, conf.width, conf.height);
+    const drag = Math.exp(-DRAG * dt);
+    for (let i = pieces.length - 1; i >= 0; i--) {
+      const p = pieces[i];
+      p.vy = (p.vy + G * dt) * drag;
+      p.vx *= drag;
+      p.x += (p.vx + Math.sin(t * p.sf + p.sp) * p.sa) * dt;
+      p.y += p.vy * dt;
+      p.rot += p.vr * dt;
+      p.fl += p.fs * dt;
+      if (p.y > VH + 80) { pieces.splice(i, 1); continue; }
+      const f = Math.cos(p.fl), flip = (f < 0 ? -1 : 1) * Math.max(0.14, Math.abs(f));
+      const k = p.len / 120, c = Math.cos(p.rot) * DPR, s = Math.sin(p.rot) * DPR;
+      cctx.setTransform(c, s, -s * flip, c * flip, p.x * DPR, p.y * DPR);
+      cctx.drawImage(p.img, -64 * k, -32 * k, 128 * k, 64 * k);
+    }
+  }
+
+  /* ---------- Wiring ---------- */
+  let pointerX = -1e5, pointerY = -1e5;
+  const clearPointer = () => { pointerX = pointerY = -1e5; };
+  window.addEventListener('pointermove', e => { pointerX = e.clientX; pointerY = e.clientY; }, { passive: true });
+  window.addEventListener('pointerdown', e => { pointerX = e.clientX; pointerY = e.clientY; }, { passive: true });
+  window.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') clearPointer(); });
+  window.addEventListener('pointercancel', clearPointer);
+  window.addEventListener('blur', clearPointer);
+  document.documentElement.addEventListener('mouseleave', clearPointer);
+
+  window.addEventListener('click', e => {
+    if (e.target.closest('button, a')) return;
+    burst(e.clientX, e.clientY, 22);
+  });
+  document.getElementById('more').addEventListener('click', () => rain(Math.round(clamp(VW / 9, 70, 140))));
+  window.addEventListener('resize', sizeConfetti);
+  window.addEventListener('hashchange', () => buildHeadline(true));
+
+  function watchWidth(el, rebuild) {
+    let lastW = el.clientWidth, timer;
+    new ResizeObserver(() => {
+      const w = el.clientWidth;
+      if (Math.abs(w - lastW) < 2) return;
+      lastW = w;
+      clearTimeout(timer);
+      timer = setTimeout(rebuild, 120);
+    }).observe(el);
+  }
+  watchWidth(typeWrap, () => buildHeadline(false));
+  watchWidth(specWrap, buildSpecimen);
+
+  sizeConfetti();
+  buildHeadline(true);
+  buildSpecimen();
+  if (!reduceMotion) rain(Math.round(clamp(VW / 7, 80, 180)));
+
+  let last = performance.now();
+  function frame(now) {
+    const dt = clamp((now - last) / 1000, 0, 0.033);
+    last = now;
+    const r = typeCanvas.getBoundingClientRect();
+    drawHeadline(dt, now / 1000, pointerX - r.left, pointerY - r.top);
+    drawConfetti(dt, now / 1000);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
